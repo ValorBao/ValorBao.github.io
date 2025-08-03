@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="android," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="System.loadLibrary&#x89E3;&#x6790;System.loadLibrary&#x548C;load&#x7684;&#x533A;&#x522B;12345678loadLibrary&#x53EA;&#x9700;&#x8981;&#x4F20;&#x5165;native-libload&#x9700;&#x8981;&#x4F20;&#x5165;so&amp;#x76">
+<meta property="og:type" content="article">
+<meta property="og:title" content="linker学习(一)">
+<meta property="og:url" content="https://valorbao.github.io/2025/08/03/linker%E5%AD%A6%E4%B9%A0/index.html">
+<meta property="og:site_name" content="Trouble Blog">
+<meta property="og:description" content="System.loadLibrary&#x89E3;&#x6790;System.loadLibrary&#x548C;load&#x7684;&#x533A;&#x522B;12345678loadLibrary&#x53EA;&#x9700;&#x8981;&#x4F20;&#x5165;native-libload&#x9700;&#x8981;&#x4F20;&#x5165;so&amp;#x76">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2025-08-03T13:18:16.000Z">
+<meta property="article:modified_time" content="2025-08-03T13:20:33.987Z">
+<meta property="article:author" content="trouble">
+<meta property="article:tag" content="android">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://ValorBao.github.io/2025/08/03/linker学习/"/>
+
+
+
+
+
+  <title>linker学习(一) | Trouble Blog</title>
+  
+
+
+
+
+
+
+
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Trouble Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/home/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://ValorBao.github.io/2025/08/03/linker%E5%AD%A6%E4%B9%A0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Trouble Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">linker学习(一)</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2025-08-03T21:18:16+08:00">
+                2025-08-03
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="System-loadLibrary&#x89E3;&#x6790;"><a href="#System-loadLibrary&#x89E3;&#x6790;" class="headerlink" title="System.loadLibrary&#x89E3;&#x6790;"></a>System.loadLibrary&#x89E3;&#x6790;</h2><h3 id="System-loadLibrary&#x548C;load&#x7684;&#x533A;&#x522B;"><a href="#System-loadLibrary&#x548C;load&#x7684;&#x533A;&#x522B;" class="headerlink" title="System.loadLibrary&#x548C;load&#x7684;&#x533A;&#x522B;"></a>System.loadLibrary&#x548C;load&#x7684;&#x533A;&#x522B;</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">loadLibrary&#x53EA;&#x9700;&#x8981;&#x4F20;&#x5165;native-lib</span><br><span class="line">load&#x9700;&#x8981;&#x4F20;&#x5165;so&#x7684;&#x7EDD;&#x5BF9;&#x8DEF;&#x5F84;</span><br><span class="line"></span><br><span class="line">load&#x6BD4;loadLibrary&#x5C11;&#x4E86;&#x67E5;&#x627E;so&#x8DEF;&#x5F84;&#x7684;&#x8FC7;&#x7A0B;</span><br><span class="line">load&#x53EA;&#x652F;&#x6301;&#x5E94;&#x7528;&#x672C;&#x5730;&#x5B58;&#x50A8;&#x8DEF;&#x5F84;/data/data/package-name,&#x6216;&#x8005;&#x662F;&#x7CFB;&#x7EDF;lib&#x76EE;&#x5F55; /system/lib /vendor/lib</span><br><span class="line">load&#x4E0D;&#x80FD;&#x52A0;&#x8F7D;sdcard&#x4E2D;&#x7684;so&#x8DEF;&#x5F84;</span><br><span class="line">loadLibrary&#x52A0;&#x8F7D;&#x7684;&#x662F;&#x4E00;&#x5F00;&#x59CB;&#x5C31;&#x6253;&#x5305;apk&#x6216;&#x7CFB;&#x7EDF;&#x7684;so&#x6587;&#x4EF6;&#xFF0C;load&#x53EF;&#x4EE5;&#x52A0;&#x8F7D;&#x4EFB;&#x610F;&#x4E00;&#x4E2A;&#x65F6;&#x523B;&#x7684;so&#x6587;&#x4EF6;</span><br><span class="line">&#x6700;&#x7EC8;&#x90FD;&#x662F;&#x8C03;&#x7528;java.lang.Runtime&#x4E2D;&#x7684;nativeLoad</span><br></pre></td></tr></table></figure>
+
+<p>&#x9996;&#x5148;&#x4ECE;java&#x5C42; <a target="_blank" rel="noopener" href="http://aosp.opersys.com/xref/android-8.1.0_r81/xref/libcore/ojluni/src/main/java/java/">java</a>/<a target="_blank" rel="noopener" href="http://aosp.opersys.com/xref/android-8.1.0_r81/xref/libcore/ojluni/src/main/java/java/lang/">lang</a>/<a target="_blank" rel="noopener" href="http://aosp.opersys.com/xref/android-8.1.0_r81/xref/libcore/ojluni/src/main/java/java/lang/System.java">System.java</a></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">System.loadLibrary(&quot;libnative-lib.so&quot;);</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">public static void loadLibrary(String libname) {</span><br><span class="line">     Runtime.getRuntime().loadLibrary0(VMStack.getCallingClassLoader(), libname);</span><br><span class="line">  }</span><br></pre></td></tr></table></figure>
+
+<p>/<a target="_blank" rel="noopener" href="http://aosp.opersys.com/xref/android-8.1.0_r81/xref/libcore/">libcore</a>/<a target="_blank" rel="noopener" href="http://aosp.opersys.com/xref/android-8.1.0_r81/xref/libcore/ojluni/">ojluni</a>/<a target="_blank" rel="noopener" href="http://aosp.opersys.com/xref/android-8.1.0_r81/xref/libcore/ojluni/src/">src</a>/<a target="_blank" rel="noopener" href="http://aosp.opersys.com/xref/android-8.1.0_r81/xref/libcore/ojluni/src/main/">main</a>/<a target="_blank" rel="noopener" href="http://aosp.opersys.com/xref/android-8.1.0_r81/xref/libcore/ojluni/src/main/java/">java</a>/<a target="_blank" rel="noopener" href="http://aosp.opersys.com/xref/android-8.1.0_r81/xref/libcore/ojluni/src/main/java/java/">java</a>/<a target="_blank" rel="noopener" href="http://aosp.opersys.com/xref/android-8.1.0_r81/xref/libcore/ojluni/src/main/java/java/lang/">lang</a>/<a target="_blank" rel="noopener" href="http://aosp.opersys.com/xref/android-8.1.0_r81/xref/libcore/ojluni/src/main/java/java/lang/Runtime.java">Runtime.java</a></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">998    synchronized void loadLibrary0(ClassLoader loader, String libname) {</span><br><span class="line">			//&#x4F20;&#x5165;&#x7684;so&#x6587;&#x4EF6;&#x540D;&#xFF0C;&#x5982;&#x679C;&#x662F;&#x8DEF;&#x5F84;&#xFF0C;&#x8DEF;&#x5F84;&#x4F1A;&#x629B;&#x51FA;&#x5F02;&#x5E38;</span><br><span class="line">999        if (libname.indexOf((int)File.separatorChar) != -1) {</span><br><span class="line">1000            throw new UnsatisfiedLinkError(</span><br><span class="line">1001    &quot;Directory separator should not appear in library name: &quot; + libname);</span><br><span class="line">1002        }</span><br><span class="line">1003        String libraryName = libname;</span><br><span class="line">			// &#x5982;&#x679C;classLoader&#x4E0D;&#x4E3A;&#x7A7A;&#xFF0C;&#x4ECE;classloader&#x4E2D;&#x83B7;&#x53D6;so&#x6587;&#x4EF6;&#x8DEF;&#x5F84;&#xFF0C;&#x9996;&#x5148;&#x8C03;&#x7528;BaseClassLoader&#x7684;findLibray</span><br><span class="line">			// BaseClassLoader&#x7684;findLibrary&#x8C03;&#x7528;DexPathList&#x7684;findLibrary&#xFF0C;&#x4F1A;&#x52A0;&#x4E0A;lib&#x524D;&#x7F00;&#x548C;so&#x540E;&#x7F00;</span><br><span class="line">			// &#x5728;BaseClassLoader&#x7684;&#x6784;&#x9020;&#x51FD;&#x6570;&#x7684;&#x65F6;&#x5019;DexPathList&#x7684;&#x6784;&#x9020;&#x51FD;&#x6570;&#x8C03;&#x7528;&#xFF0C;DexPathList&#x7684;nativeLibraryDirectories&#x5B57;&#x6BB5;&#x4FDD;&#x5B58;apk&#x4E2D;&#x7684;so&#x8DEF;&#x5F84;&#x548C;&#x7CFB;&#x7EDF;			  // so&#x5B58;&#x653E;&#x8DEF;&#x5F84;&#xFF0C;&#x5E94;&#x7528;&#x7684;lib&#x76EE;&#x5F55;&#x4F1A;&#x653E;&#x5728;&#x7B2C;&#x4E00;&#x4E2A;&#x4F4D;&#x7F6E;&#xFF0C;so&#x6587;&#x4EF6;&#x4F1A;&#x5148;&#x4ECE;&#x5E94;&#x7528;&#x672C;&#x8EAB;&#x7684;&#x76EE;&#x5F55;&#x5F00;&#x59CB;&#x67E5;&#x627E;  &#x4E0D;&#x5B58;&#x5728;&#x7684;&#x8BDD;&#x624D;&#x4F1A;&#x4ECE;&#x7CFB;&#x7EDF;lib&#x8DEF;&#x5F84;(/system/lib&#x3001;/vendor/lib&#x7B49;)</span><br><span class="line">1004        if (loader != null) {</span><br><span class="line">1005            String filename = loader.findLibrary(libraryName); </span><br><span class="line">1006            if (filename == null) {</span><br><span class="line">1007                // It&apos;s not necessarily true that the ClassLoader used</span><br><span class="line">1008                // System.mapLibraryName, but the default setup does, and it&apos;s</span><br><span class="line">1009                // misleading to say we didn&apos;t find &quot;libMyLibrary.so&quot; when we</span><br><span class="line">1010                // actually searched for &quot;liblibMyLibrary.so.so&quot;.</span><br><span class="line">1011                throw new UnsatisfiedLinkError(loader + &quot; couldn&apos;t find \&quot;&quot; +</span><br><span class="line">1012                                               System.mapLibraryName(libraryName) + &quot;\&quot;&quot;);</span><br><span class="line">1013            }</span><br><span class="line">1014            String error = doLoad(filename, loader); // &#x4E3B;&#x8981;&#x901A;&#x8FC7;&#x8FD9;&#x4E2A;&#x6765;&#x5BFB;&#x627E;</span><br><span class="line">1015            if (error != null) {</span><br><span class="line">1016                throw new UnsatisfiedLinkError(error);</span><br><span class="line">1017            }</span><br><span class="line">1018            return;</span><br><span class="line">1019        }</span><br><span class="line">1020		// mapLibraryName &#x5C31;&#x662F;&#x628A; so&#x52A0;&#x4E0A;lib + &quot;libraryName&quot; + &quot;.so&quot;</span><br><span class="line">1021        String filename = System.mapLibraryName(libraryName);</span><br><span class="line">1022        List&lt;String&gt; candidates = new ArrayList&lt;String&gt;();</span><br><span class="line">1023        String lastError = null;</span><br><span class="line">			// getLibPaths &#x5F53;ClassLoader&#x4E3A;&#x7A7A;&#x7684;&#x65F6;&#x5019;&#xFF0C;&#x83B7;&#x53D6;system&#x6307;&#x5B9A;&#x7684;vm library Path&#x5217;&#x8868;&#xFF0C;&#x5C11;&#x4E86;app&#x7684;lib&#x8DEF;&#x5F84;</span><br><span class="line">1024        for (String directory : getLibPaths()) {</span><br><span class="line">1025            String candidate = directory + filename;</span><br><span class="line">1026            candidates.add(candidate);</span><br><span class="line">1027</span><br><span class="line">1028            if (IoUtils.canOpenReadOnly(candidate)) {</span><br><span class="line">1029                String error = doLoad(candidate, loader);</span><br><span class="line">1030                if (error == null) {</span><br><span class="line">1031                    return; // We successfully loaded the library. Job done.</span><br><span class="line">1032                }</span><br><span class="line">1033                lastError = error;</span><br><span class="line">1034            }</span><br><span class="line">1035        }</span><br><span class="line">1036</span><br><span class="line">1037        if (lastError != null) {</span><br><span class="line">1038            throw new UnsatisfiedLinkError(lastError);</span><br><span class="line">1039        }</span><br><span class="line">1040        throw new UnsatisfiedLinkError(&quot;Library &quot; + libraryName + &quot; not found; tried &quot; + candidates);</span><br><span class="line">1041    }</span><br></pre></td></tr></table></figure>
+
+<h5 id="doLoad"><a href="#doLoad" class="headerlink" title="doLoad"></a>doLoad</h5><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">1070    private String doLoad(String name, ClassLoader loader) {</span><br><span class="line">1071        // Android apps are forked from the zygote, so they can&apos;t have a custom LD_LIBRARY_PATH,</span><br><span class="line">1072        // which means that by default an app&apos;s shared library directory isn&apos;t on LD_LIBRARY_PATH.</span><br><span class="line">1073</span><br><span class="line">1074        // The PathClassLoader set up by frameworks/base knows the appropriate path, so we can load</span><br><span class="line">1075        // libraries with no dependencies just fine, but an app that has multiple libraries that</span><br><span class="line">1076        // depend on each other needed to load them in most-dependent-first order.</span><br><span class="line">1077</span><br><span class="line">1078        // We added API to Android&apos;s dynamic linker so we can update the library path used for</span><br><span class="line">1079        // the currently-running process. We pull the desired path out of the ClassLoader here</span><br><span class="line">1080        // and pass it to nativeLoad so that it can call the private dynamic linker API.</span><br><span class="line">1081</span><br><span class="line">1082        // We didn&apos;t just change frameworks/base to update the LD_LIBRARY_PATH once at the</span><br><span class="line">1083        // beginning because multiple apks can run in the same process and third party code can</span><br><span class="line">1084        // use its own BaseDexClassLoader.</span><br><span class="line">1085</span><br><span class="line">1086        // We didn&apos;t just add a dlopen_with_custom_LD_LIBRARY_PATH call because we wanted any</span><br><span class="line">1087        // dlopen(3) calls made from a .so&apos;s JNI_OnLoad to work too.</span><br><span class="line">1088</span><br><span class="line">1089        // So, find out what the native library search path is for the ClassLoader in question...</span><br><span class="line">1090        String librarySearchPath = null;</span><br><span class="line">1091        if (loader != null &amp;&amp; loader instanceof BaseDexClassLoader) {</span><br><span class="line">1092            BaseDexClassLoader dexClassLoader = (BaseDexClassLoader) loader;</span><br><span class="line">1093            librarySearchPath = dexClassLoader.getLdLibraryPath();</span><br><span class="line">1094        }</span><br><span class="line">1095        // nativeLoad should be synchronized so there&apos;s only one LD_LIBRARY_PATH in use regardless</span><br><span class="line">1096        // of how many ClassLoaders are in the system, but dalvik doesn&apos;t support synchronized</span><br><span class="line">1097        // internal natives.</span><br><span class="line">1098        synchronized (this) {</span><br><span class="line">1099            return nativeLoad(name, loader, librarySearchPath);</span><br><span class="line">1100        }</span><br><span class="line">1101    }</span><br><span class="line">1102</span><br><span class="line">1103    // TODO: should be synchronized, but dalvik doesn&apos;t support synchronized internal natives.</span><br><span class="line">1104    private static native String nativeLoad(String filename, ClassLoader loader,</span><br><span class="line">1105                                            String librarySearchPath);</span><br></pre></td></tr></table></figure>
+
+<h5 id="doLoad-&#x5BF9;&#x5E94;&#x7684;native&#x65B9;&#x6CD5;-JVM-NativeLoad"><a href="#doLoad-&#x5BF9;&#x5E94;&#x7684;native&#x65B9;&#x6CD5;-JVM-NativeLoad" class="headerlink" title="doLoad &#x5BF9;&#x5E94;&#x7684;native&#x65B9;&#x6CD5; JVM_NativeLoad"></a>doLoad &#x5BF9;&#x5E94;&#x7684;native&#x65B9;&#x6CD5; JVM_NativeLoad</h5><p>/<a target="_blank" rel="noopener" href="http://aosp.opersys.com/xref/android-8.1.0_r81/xref/art/">art</a>/<a target="_blank" rel="noopener" href="http://aosp.opersys.com/xref/android-8.1.0_r81/xref/art/runtime/">runtime</a>/<a target="_blank" rel="noopener" href="http://aosp.opersys.com/xref/android-8.1.0_r81/xref/art/runtime/openjdkjvm/">openjdkjvm</a>/<a target="_blank" rel="noopener" href="http://aosp.opersys.com/xref/android-8.1.0_r81/xref/art/runtime/openjdkjvm/OpenjdkJvm.cc">OpenjdkJvm.cc</a></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br><span class="line">JNIEXPORT jstring JVM_NativeLoad(JNIEnv* env,</span><br><span class="line">323                                 jstring javaFilename,</span><br><span class="line">324                                 jobject javaLoader,</span><br><span class="line">325                                 jstring javaLibrarySearchPath) {</span><br><span class="line">	 // &#x5C06;jstring&#x7684;javaFilename &#x8F6C;&#x6362;&#x4E3A;c++&#x7684; string filename</span><br><span class="line">326  ScopedUtfChars filename(env, javaFilename);</span><br><span class="line">327  if (filename.c_str() == NULL) {</span><br><span class="line">328    return NULL;</span><br><span class="line">329  }</span><br><span class="line">330</span><br><span class="line">331  std::string error_msg;</span><br><span class="line">332  {</span><br><span class="line">333    art::JavaVMExt* vm = art::Runtime::Current()-&gt;GetJavaVM();</span><br><span class="line"> 	//&#x8FD9;&#x8FB9;&#x662F;&#x5B9E;&#x9645;&#x6267;&#x884C;so&#x52A0;&#x8F7D;&#x7684;&#x64CD;&#x4F5C;&#x8C03;&#x7528;</span><br><span class="line">334    bool success = vm-&gt;LoadNativeLibrary(env,</span><br><span class="line">335                                         filename.c_str(),</span><br><span class="line">336                                         javaLoader,</span><br><span class="line">337                                         javaLibrarySearchPath,</span><br><span class="line">338                                         &amp;error_msg);</span><br><span class="line">339    if (success) {</span><br><span class="line">340      return nullptr;</span><br><span class="line">341    }</span><br><span class="line">342  }</span><br><span class="line">343</span><br><span class="line">344  // Don&apos;t let a pending exception from JNI_OnLoad cause a CheckJNI issue with NewStringUTF.</span><br><span class="line">345  env-&gt;ExceptionClear();</span><br><span class="line">346  return env-&gt;NewStringUTF(error_msg.c_str());</span><br><span class="line">347}</span><br></pre></td></tr></table></figure>
+
+<h5 id="art-runtime-java-vm-ext-cc"><a href="#art-runtime-java-vm-ext-cc" class="headerlink" title="/art/runtime/java_vm_ext.cc"></a>/<a target="_blank" rel="noopener" href="http://aosp.opersys.com/xref/android-8.1.0_r81/xref/art/">art</a>/<a target="_blank" rel="noopener" href="http://aosp.opersys.com/xref/android-8.1.0_r81/xref/art/runtime/">runtime</a>/<a target="_blank" rel="noopener" href="http://aosp.opersys.com/xref/android-8.1.0_r81/xref/art/runtime/java_vm_ext.cc">java_vm_ext.cc</a></h5><h5 id="LoadNativeLibrary"><a href="#LoadNativeLibrary" class="headerlink" title="LoadNativeLibrary"></a>LoadNativeLibrary</h5><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br></pre></td><td class="code"><pre><span class="line">bool JavaVMExt::LoadNativeLibrary(JNIEnv* env,</span><br><span class="line">797                                  const std::string&amp; path,</span><br><span class="line">798                                  jobject class_loader,</span><br><span class="line">799                                  jstring library_path,</span><br><span class="line">800                                  std::string* error_msg) {</span><br><span class="line">801  error_msg-&gt;clear();</span><br><span class="line">802</span><br><span class="line">803  // See if we&apos;ve already loaded this library.  If we have, and the class loader</span><br><span class="line">804  // matches, return successfully without doing anything.</span><br><span class="line">805  // TODO: for better results we should canonicalize the pathname (or even compare</span><br><span class="line">806  // inodes). This implementation is fine if everybody is using System.loadLibrary.</span><br><span class="line">807  SharedLibrary* library;</span><br><span class="line">808  Thread* self = Thread::Current();</span><br><span class="line">809  {</span><br><span class="line">810    // TODO: move the locking (and more of this logic) into Libraries.</span><br><span class="line">811    MutexLock mu(self, *Locks::jni_libraries_lock_);</span><br><span class="line">812    library = libraries_-&gt;Get(path);</span><br><span class="line">813  }</span><br><span class="line">814  void* class_loader_allocator = nullptr;</span><br><span class="line">815  {</span><br><span class="line">816    ScopedObjectAccess soa(env);</span><br><span class="line">817    // As the incoming class loader is reachable/alive during the call of this function,</span><br><span class="line">818    // it&apos;s okay to decode it without worrying about unexpectedly marking it alive.</span><br><span class="line">819    ObjPtr&lt;mirror::ClassLoader&gt; loader = soa.Decode&lt;mirror::ClassLoader&gt;(class_loader);</span><br><span class="line">820</span><br><span class="line">821    ClassLinker* class_linker = Runtime::Current()-&gt;GetClassLinker();</span><br><span class="line">822    if (class_linker-&gt;IsBootClassLoader(soa, loader.Ptr())) {</span><br><span class="line">823      loader = nullptr;</span><br><span class="line">824      class_loader = nullptr;</span><br><span class="line">825    }</span><br><span class="line">826</span><br><span class="line">827    class_loader_allocator = class_linker-&gt;GetAllocatorForClassLoader(loader.Ptr());</span><br><span class="line">828    CHECK(class_loader_allocator != nullptr);</span><br><span class="line">829  }</span><br><span class="line">830  if (library != nullptr) {</span><br><span class="line">831    // Use the allocator pointers for class loader equality to avoid unnecessary weak root decode.</span><br><span class="line">832    if (library-&gt;GetClassLoaderAllocator() != class_loader_allocator) {</span><br><span class="line">833      // The library will be associated with class_loader. The JNI</span><br><span class="line">834      // spec says we can&apos;t load the same library into more than one</span><br><span class="line">835      // class loader.</span><br><span class="line">836      StringAppendF(error_msg, &quot;Shared library \&quot;%s\&quot; already opened by &quot;</span><br><span class="line">837          &quot;ClassLoader %p; can&apos;t open in ClassLoader %p&quot;,</span><br><span class="line">838          path.c_str(), library-&gt;GetClassLoader(), class_loader);</span><br><span class="line">839      LOG(WARNING) &lt;&lt; error_msg;</span><br><span class="line">840      return false;</span><br><span class="line">841    }</span><br><span class="line">842    VLOG(jni) &lt;&lt; &quot;[Shared library \&quot;&quot; &lt;&lt; path &lt;&lt; &quot;\&quot; already loaded in &quot;</span><br><span class="line">843              &lt;&lt; &quot; ClassLoader &quot; &lt;&lt; class_loader &lt;&lt; &quot;]&quot;;</span><br><span class="line">844    if (!library-&gt;CheckOnLoadResult()) {</span><br><span class="line">845      StringAppendF(error_msg, &quot;JNI_OnLoad failed on a previous attempt &quot;</span><br><span class="line">846          &quot;to load \&quot;%s\&quot;&quot;, path.c_str());</span><br><span class="line">847      return false;</span><br><span class="line">848    }</span><br><span class="line">849    return true;</span><br><span class="line">850  }</span><br><span class="line">851</span><br><span class="line">852  // Open the shared library.  Because we&apos;re using a full path, the system</span><br><span class="line">853  // doesn&apos;t have to search through LD_LIBRARY_PATH.  (It may do so to</span><br><span class="line">854  // resolve this library&apos;s dependencies though.)</span><br><span class="line">855</span><br><span class="line">856  // Failures here are expected when java.library.path has several entries</span><br><span class="line">857  // and we have to hunt for the lib.</span><br><span class="line">858</span><br><span class="line">859  // Below we dlopen but there is no paired dlclose, this would be necessary if we supported</span><br><span class="line">860  // class unloading. Libraries will only be unloaded when the reference count (incremented by</span><br><span class="line">861  // dlopen) becomes zero from dlclose.</span><br><span class="line">862</span><br><span class="line">863  Locks::mutator_lock_-&gt;AssertNotHeld(self);</span><br><span class="line">864  const char* path_str = path.empty() ? nullptr : path.c_str();</span><br><span class="line">865  bool needs_native_bridge = false;</span><br><span class="line">866  void* handle = android::OpenNativeLibrary(env,</span><br><span class="line">867                                            runtime_-&gt;GetTargetSdkVersion(),</span><br><span class="line">868                                            path_str,</span><br><span class="line">869                                            class_loader,</span><br><span class="line">870                                            library_path,</span><br><span class="line">871                                            &amp;needs_native_bridge,</span><br><span class="line">872                                            error_msg);</span><br><span class="line">873</span><br><span class="line">874  VLOG(jni) &lt;&lt; &quot;[Call to dlopen(\&quot;&quot; &lt;&lt; path &lt;&lt; &quot;\&quot;, RTLD_NOW) returned &quot; &lt;&lt; handle &lt;&lt; &quot;]&quot;;</span><br><span class="line">875</span><br><span class="line">876  if (handle == nullptr) {</span><br><span class="line">877    VLOG(jni) &lt;&lt; &quot;dlopen(\&quot;&quot; &lt;&lt; path &lt;&lt; &quot;\&quot;, RTLD_NOW) failed: &quot; &lt;&lt; *error_msg;</span><br><span class="line">878    return false;</span><br><span class="line">879  }</span><br><span class="line">880</span><br><span class="line">881  if (env-&gt;ExceptionCheck() == JNI_TRUE) {</span><br><span class="line">882    LOG(ERROR) &lt;&lt; &quot;Unexpected exception:&quot;;</span><br><span class="line">883    env-&gt;ExceptionDescribe();</span><br><span class="line">884    env-&gt;ExceptionClear();</span><br><span class="line">885  }</span><br><span class="line">886  // Create a new entry.</span><br><span class="line">887  // TODO: move the locking (and more of this logic) into Libraries.</span><br><span class="line">888  bool created_library = false;</span><br><span class="line">889  {</span><br><span class="line">890    // Create SharedLibrary ahead of taking the libraries lock to maintain lock ordering.</span><br><span class="line">891    std::unique_ptr&lt;SharedLibrary&gt; new_library(</span><br><span class="line">892        new SharedLibrary(env,</span><br><span class="line">893                          self,</span><br><span class="line">894                          path,</span><br><span class="line">895                          handle,</span><br><span class="line">896                          needs_native_bridge,</span><br><span class="line">897                          class_loader,</span><br><span class="line">898                          class_loader_allocator));</span><br><span class="line">899</span><br><span class="line">900    MutexLock mu(self, *Locks::jni_libraries_lock_);</span><br><span class="line">901    library = libraries_-&gt;Get(path);</span><br><span class="line">902    if (library == nullptr) {  // We won race to get libraries_lock.</span><br><span class="line">903      library = new_library.release();</span><br><span class="line">904      libraries_-&gt;Put(path, library);</span><br><span class="line">905      created_library = true;</span><br><span class="line">906    }</span><br><span class="line">907  }</span><br><span class="line">908  if (!created_library) {</span><br><span class="line">909    LOG(INFO) &lt;&lt; &quot;WOW: we lost a race to add shared library: &quot;</span><br><span class="line">910        &lt;&lt; &quot;\&quot;&quot; &lt;&lt; path &lt;&lt; &quot;\&quot; ClassLoader=&quot; &lt;&lt; class_loader;</span><br><span class="line">911    return library-&gt;CheckOnLoadResult();</span><br><span class="line">912  }</span><br><span class="line">913  VLOG(jni) &lt;&lt; &quot;[Added shared library \&quot;&quot; &lt;&lt; path &lt;&lt; &quot;\&quot; for ClassLoader &quot; &lt;&lt; class_loader &lt;&lt; &quot;]&quot;;</span><br><span class="line">914</span><br><span class="line">915  bool was_successful = false;</span><br><span class="line">916  void* sym = library-&gt;FindSymbol(&quot;JNI_OnLoad&quot;, nullptr);</span><br><span class="line">917  if (sym == nullptr) {</span><br><span class="line">918    VLOG(jni) &lt;&lt; &quot;[No JNI_OnLoad found in \&quot;&quot; &lt;&lt; path &lt;&lt; &quot;\&quot;]&quot;;</span><br><span class="line">919    was_successful = true;</span><br><span class="line">920  } else {</span><br><span class="line">921    // Call JNI_OnLoad.  We have to override the current class</span><br><span class="line">922    // loader, which will always be &quot;null&quot; since the stuff at the</span><br><span class="line">923    // top of the stack is around Runtime.loadLibrary().  (See</span><br><span class="line">924    // the comments in the JNI FindClass function.)</span><br><span class="line">925    ScopedLocalRef&lt;jobject&gt; old_class_loader(env, env-&gt;NewLocalRef(self-&gt;GetClassLoaderOverride()));</span><br><span class="line">926    self-&gt;SetClassLoaderOverride(class_loader);</span><br><span class="line">927</span><br><span class="line">928    VLOG(jni) &lt;&lt; &quot;[Calling JNI_OnLoad in \&quot;&quot; &lt;&lt; path &lt;&lt; &quot;\&quot;]&quot;;</span><br><span class="line">929    typedef int (*JNI_OnLoadFn)(JavaVM*, void*);</span><br><span class="line">930    JNI_OnLoadFn jni_on_load = reinterpret_cast&lt;JNI_OnLoadFn&gt;(sym);</span><br><span class="line">931    int version = (*jni_on_load)(this, nullptr);</span><br><span class="line">932</span><br><span class="line">933    if (runtime_-&gt;GetTargetSdkVersion() != 0 &amp;&amp; runtime_-&gt;GetTargetSdkVersion() &lt;= 21) {</span><br><span class="line">934      // Make sure that sigchain owns SIGSEGV.</span><br><span class="line">935      EnsureFrontOfChain(SIGSEGV);</span><br><span class="line">936    }</span><br><span class="line">937</span><br><span class="line">938    self-&gt;SetClassLoaderOverride(old_class_loader.get());</span><br><span class="line">939</span><br><span class="line">940    if (version == JNI_ERR) {</span><br><span class="line">941      StringAppendF(error_msg, &quot;JNI_ERR returned from JNI_OnLoad in \&quot;%s\&quot;&quot;, path.c_str());</span><br><span class="line">942    } else if (JavaVMExt::IsBadJniVersion(version)) {</span><br><span class="line">943      StringAppendF(error_msg, &quot;Bad JNI version returned from JNI_OnLoad in \&quot;%s\&quot;: %d&quot;,</span><br><span class="line">944                    path.c_str(), version);</span><br><span class="line">945      // It&apos;s unwise to call dlclose() here, but we can mark it</span><br><span class="line">946      // as bad and ensure that future load attempts will fail.</span><br><span class="line">947      // We don&apos;t know how far JNI_OnLoad got, so there could</span><br><span class="line">948      // be some partially-initialized stuff accessible through</span><br><span class="line">949      // newly-registered native method calls.  We could try to</span><br><span class="line">950      // unregister them, but that doesn&apos;t seem worthwhile.</span><br><span class="line">951    } else {</span><br><span class="line">952      was_successful = true;</span><br><span class="line">953    }</span><br><span class="line">954    VLOG(jni) &lt;&lt; &quot;[Returned &quot; &lt;&lt; (was_successful ? &quot;successfully&quot; : &quot;failure&quot;)</span><br><span class="line">955              &lt;&lt; &quot; from JNI_OnLoad in \&quot;&quot; &lt;&lt; path &lt;&lt; &quot;\&quot;]&quot;;</span><br><span class="line">956  }</span><br><span class="line">957</span><br><span class="line">958  library-&gt;SetResult(was_successful);</span><br><span class="line">959  return was_successful;</span><br><span class="line">960}</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">LoadNativeLibrary&#x4E3B;&#x8981;&#x4EFB;&#x52A1;&#x662F;</span><br><span class="line">1. &#x5148;&#x5224;&#x65AD;&#x662F;&#x5426;&#x52A0;&#x8F7D;&#x8FC7;so,&#x5E76;&#x4E14;&#x5224;&#x65AD;classLoader&#x8981;&#x5339;&#x914D;&#xFF0C;&#x540C;&#x4E00;&#x4E2A;so&#x4E0D;&#x80FD;&#x88AB;&#x4E0D;&#x540C;&#x7684;classLoader&#x52A0;&#x8F7D;</span><br><span class="line">2.&#x6CA1;&#x52A0;&#x8F7D;&#x8FC7;so,&#x8C03;&#x7528;OpenNativeLibrary&#x6765;&#x52A0;&#x8F7D;&#xFF0C;&#x53C2;&#x6570;path.c_str()&#x4F20;&#x9012;&#x7684;&#x662F;&#x52A8;&#x6001;&#x5E93;&#x7684;&#x5168;&#x8DEF;&#x5F84;&#xFF0C;&#x4E4B;&#x6240;&#x4EE5;&#x8FD8;&#x7528;&#x63D0;&#x4F9B;&#x641C;&#x7D22;&#x8DEF;&#x5F84;&#xFF0C;&#x56E0;&#x4E3A;&#x5305;&#x542B;&#x4F9D;&#x8D56;&#x5E93;</span><br><span class="line">3.&#x52A0;&#x8F7D;&#x6210;&#x529F;&#x540E;&#xFF0C;&#x521B;&#x5EFA;new SharedLibrary,&#x7136;&#x540E;&#x67E5;&#x770B;&#x8FD9;&#x4E2A;so&#x6709;&#x6CA1;&#x6709;JNI_OnLoad&#x65B9;&#x6CD5;&#xFF0C;&#x6709;&#x7684;&#x8BDD;&#x5C31;&#x8C03;&#x7528;</span><br><span class="line">4.&#x67E5;&#x770B;&#x8C03;&#x7528;JNI_OnLoad&#x7684;&#x7ED3;&#x679C;</span><br></pre></td></tr></table></figure>
+
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/android/" rel="tag"># android</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2025/08/03/C-%E6%A6%82%E5%BF%B5%E5%AD%A6%E4%B9%A0/" rel="next" title="C++概念学习(一)">
+                <i class="fa fa-chevron-left"></i> C++概念学习(一)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2025/08/03/ClassLoader/" rel="prev" title="ClassLoader">
+                ClassLoader <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name"></p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">4</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">3</span>
+                  <span class="site-state-item-name">tags</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#System-loadLibrary%E8%A7%A3%E6%9E%90"><span class="nav-number">1.</span> <span class="nav-text">System.loadLibrary解析</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#System-loadLibrary%E5%92%8Cload%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="nav-number">1.1.</span> <span class="nav-text">System.loadLibrary和load的区别</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#doLoad"><span class="nav-number">1.1.0.1.</span> <span class="nav-text">doLoad</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#doLoad-%E5%AF%B9%E5%BA%94%E7%9A%84native%E6%96%B9%E6%B3%95-JVM-NativeLoad"><span class="nav-number">1.1.0.2.</span> <span class="nav-text">doLoad 对应的native方法 JVM_NativeLoad</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#art-runtime-java-vm-ext-cc"><span class="nav-number">1.1.0.3.</span> <span class="nav-text">&#x2F;art&#x2F;runtime&#x2F;java_vm_ext.cc</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#LoadNativeLibrary"><span class="nav-number">1.1.0.4.</span> <span class="nav-text">LoadNativeLibrary</span></a></li></ol></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">trouble</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
